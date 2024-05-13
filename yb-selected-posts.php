@@ -17,6 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 /**
  * Registers the block using the metadata loaded from the `block.json` file.
  * Behind the scenes, it registers also all assets so they can be enqueued
@@ -28,3 +30,8 @@ function create_block_yb_selected_posts_block_init() {
 	register_block_type( __DIR__ . '/build' );
 }
 add_action( 'init', 'create_block_yb_selected_posts_block_init' );
+
+// Main plugin class.
+if ( class_exists( \YBSelectedPosts\Plugin::class ) ) {
+	new \YBSelectedPosts\Plugin();
+}
