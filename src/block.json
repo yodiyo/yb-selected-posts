@@ -1,19 +1,38 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "create-block/yb-selected-posts",
-	"version": "0.1.0",
-	"title": "Yb Selected Posts",
+	"name": "yb-selected-posts/yb-selected-posts",
+	"version": "1.0.0",
+	"title": "YB Selected Posts",
 	"category": "widgets",
-	"icon": "smiley",
-	"description": "Example block scaffolded with Create Block tool.",
+	"icon": "admin-post",
+	"description": "Add links to published posts.",
 	"example": {},
 	"supports": {
-		"html": false
+		"color": {
+			"text": true,
+			"background": true,
+			"link": true
+		}
+	},
+	"attributes": {
+		"selectedPost": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				},
+				"link": {
+					"type": "string"
+				}
+			}
+		}
 	},
 	"textdomain": "yb-selected-posts",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css",
-	"viewScript": "file:./view.js"
+	"style": "file:./style-index.css"
 }
