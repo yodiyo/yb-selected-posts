@@ -1,16 +1,16 @@
 <?php
 /**
- * Plugin Name:       Yb Selected Posts
- * Description:       Example block scaffolded with Create Block tool.
- * Requires at least: 6.1
+ * Plugin Name:       YB Selected Posts
+ * Description:       Block for adding a link to published posts.
+ * Requires at least: 6.5
  * Requires PHP:      7.0
- * Version:           0.1.0
- * Author:            The WordPress Contributors
+ * Version:           1.0.0
+ * Author:            Yorick Brown
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       yb-selected-posts
  *
- * @package CreateBlock
+ * @package YBSelectedPosts
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

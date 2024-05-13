@@ -1,8 +1,8 @@
 {
 	"name": "yb-selected-posts",
-	"version": "0.1.0",
-	"description": "Example block scaffolded with Create Block tool.",
-	"author": "The WordPress Contributors",
+	"version": "1.0.0",
+	"description": "Block for adding a link to published posts.",
+	"author": "Yorick Brown",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {
@@ -16,5 +16,11 @@
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^27.8.0"
+	},
+	"dependencies": {
+		"@wordpress/components": "^27.5.0",
+		"@wordpress/core-data": "^6.34.0",
+		"@wordpress/element": "^5.34.0",
+		"@wordpress/i18n": "^4.57.0"
 	}
 }

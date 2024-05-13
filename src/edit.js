@@ -19,17 +19,8 @@ export default function Edit( { attributes, setAttributes } ) {
 		}
 	);
 
-	const handleComboboxChange = ( newValue ) => {
-		// Find the selected post object from searchResults based on the selected post ID
-		const selectedPostObject = searchResults.find(post => post.id === newValue);
-
-		const { id, title: { rendered }, link } = selectedPostObject;
-		setSelectedPost( { id, title: { rendered }, link } );
-		setAttributes( { selectedPost: { id, title: { rendered }, link } } );
-	};
-
 	useEffect( () => {
-		if( ! hasResolved ) {
+		if ( ! hasResolved || isResolving ) {
 			return;
 		}
 
@@ -40,16 +31,34 @@ export default function Edit( { attributes, setAttributes } ) {
 		}
 	}, [ selectedPost, attributes.selectedPost, hasResolved, searchResults ] );
 
+	const handleComboboxChange = ( newValue ) => {
+
+		if ( isNaN( newValue) || newValue === null || ! searchResults ) {
+			return;
+		}
+
+		// Find the selected post object from searchResults based on the selected post ID
+		const selectedPostObject = searchResults.find( post => post.id === newValue );
+
+		const { id, title: { rendered }, link } = selectedPostObject;
+		setSelectedPost( { id, title: { rendered }, link } );
+		setAttributes( { selectedPost: { id, title: { rendered }, link } } );
+	};
+
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
 				<PanelBody title={__('Block Settings')}>
 					<ComboboxControl
 						label = { __( 'Search Posts' ) }
-						options = { searchResults?.map( ( post ) => ( {
-							value: post.id,
-							label: post.title.rendered,
-						} ) ) }
+						options = { searchResults ?
+							searchResults.map( ( post ) => ( {
+								value: post.id,
+								label: post.title.rendered,
+							} ) )
+							:
+							[]
+						}
 						onChange = { handleComboboxChange }
 						onInputChange = { setSearchText }
 						selected = { selectedPost ? selectedPost.id : '' }
