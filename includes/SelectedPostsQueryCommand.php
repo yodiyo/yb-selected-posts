@@ -89,7 +89,7 @@ class SelectedPostsQueryCommand extends \WP_CLI_Command {
 				}
 			}
 			// Increment page counter
-			$paged++;
+			++$paged;
 			$total_pages = $query->max_num_pages;
 
 			// Update progress bar

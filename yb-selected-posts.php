@@ -33,6 +33,5 @@ add_action( 'init', 'create_block_yb_selected_posts_block_init' );
 
 // Main plugin class.
 if ( class_exists( \YBSelectedPosts\Plugin::class ) ) {
-	error_log('test111');
 	new \YBSelectedPosts\Plugin();
 }

@@ -29,7 +29,6 @@ class Plugin {
 	 * Constructor.
 	 */
 	public function __construct() {
-		error_log('test1213');
 		// Register Admin.
 		$this->wpcli_command = new SelectedPostsQueryCommand();
 	}
