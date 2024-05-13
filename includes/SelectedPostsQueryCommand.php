@@ -52,7 +52,7 @@ class SelectedPostsQueryCommand extends \WP_CLI_Command {
 			'post_status'    => 'publish',
 			'fields'         => 'ids',
 			'posts_per_page' => 100,
-			's'              => '<!-- wp:yb-selected-posts/selected-posts',
+			's'              => '<!-- wp:yb-selected-posts/yb-selected-posts',
 			'date_query'     => array(
 				array(
 					'after'     => $date_after->format( 'Y-m-d' ),

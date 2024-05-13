@@ -29,6 +29,11 @@ class Plugin {
 	 * Constructor.
 	 */
 	public function __construct() {
+
+		// Bail if WP CLI is not present
+		if ( ! defined( 'WP_CLI' ) ) {
+			return;
+		}
 		// Register Admin.
 		$this->wpcli_command = new SelectedPostsQueryCommand();
 	}
