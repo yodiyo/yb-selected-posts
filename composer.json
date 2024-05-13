@@ -1,0 +1,27 @@
+{
+    "name": "yorickbrown/yb-selected-posts",
+    "description": "Block for adding a link to published posts.",
+    "type": "wordpress-plugin",
+    "license": "GPLv2",
+    "autoload": {
+        "psr-4": {
+            "YBSelectedPosts\\": "includes/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Yorick Brown",
+            "email": "info@theyoricktouch.co.uk"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+		"composer/installers": "^2.2.0",
+        "wp-cli/wp-cli": "^2.10"
+	},
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true
+        }
+    }
+}
