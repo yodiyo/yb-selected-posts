@@ -1,0 +1,79 @@
+name: Release Plugin
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Triggers on version tags like v1.0.0, v1.2.3, etc.
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          tools: composer
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Install Composer dependencies (production)
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Create plugin zip
+        run: npm run plugin-zip
+
+      - name: Get plugin version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## What's Changed in v${{ steps.get_version.outputs.VERSION }}
+
+            📦 **Ready-to-install WordPress plugin**
+
+            ### Installation
+            1. Download the `yb-selected-posts.zip` file below
+            2. Go to your WordPress admin → Plugins → Add New → Upload Plugin
+            3. Upload the zip file and activate
+
+            ### Features
+            - No manual build steps required
+            - All dependencies included
+            - Ready to use immediately after activation
+
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.get_version.outputs.VERSION }}...HEAD
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./yb-selected-posts.zip
+          asset_name: yb-selected-posts-v${{ steps.get_version.outputs.VERSION }}.zip
+          asset_content_type: application/zip

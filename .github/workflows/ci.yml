@@ -1,0 +1,59 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ["7.4", "8.0", "8.1", "8.2"]
+        node-version: ["16", "18", "20"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run JavaScript linting
+        run: npm run lint:js
+
+      - name: Run CSS linting
+        run: npm run lint:css
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Test plugin zip creation
+        run: npm run plugin-zip
+
+      - name: Verify zip contents
+        run: |
+          unzip -l yb-selected-posts.zip
+          # Check that essential files are present
+          unzip -Z1 yb-selected-posts.zip | grep -q "yb-selected-posts.php" || exit 1
+          unzip -Z1 yb-selected-posts.zip | grep -q "build/index.js" || exit 1
+          unzip -Z1 yb-selected-posts.zip | grep -q "vendor/autoload.php" || exit 1
+          echo "✅ All essential files present in zip"

@@ -12,7 +12,9 @@
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"start": "wp-scripts start"
+		"start": "wp-scripts start",
+		"dist": "npm run build && composer install --no-dev --optimize-autoloader && npm run plugin-zip",
+		"dist:clean": "rm -rf node_modules && npm run dist"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^27.8.0"
@@ -27,7 +29,8 @@
 		"build",
 		"includes",
 		"vendor",
-		"yb-selected-posts.php"
+		"yb-selected-posts.php",
+		"readme.txt",
+		"composer.json"
 	]
-
 }

@@ -1,0 +1,109 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "Version bump type"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      release_notes:
+        description: "Release notes (optional)"
+        required: false
+        type: string
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Bump version in package.json
+        id: version_bump
+        run: |
+          OLD_VERSION=$(node -p "require('./package.json').version")
+          npm version ${{ github.event.inputs.version_type }} --no-git-tag-version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "OLD_VERSION=$OLD_VERSION" >> $GITHUB_OUTPUT
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update plugin header version
+        run: |
+          NEW_VERSION=${{ steps.version_bump.outputs.NEW_VERSION }}
+          sed -i "s/Version:.*$/Version:           $NEW_VERSION/" yb-selected-posts.php
+
+      - name: Update readme.txt version
+        run: |
+          NEW_VERSION=${{ steps.version_bump.outputs.NEW_VERSION }}
+          sed -i "s/Stable tag:.*/Stable tag: $NEW_VERSION/" readme.txt
+
+      - name: Create/Update CHANGELOG.md
+        run: |
+          NEW_VERSION=${{ steps.version_bump.outputs.NEW_VERSION }}
+          DATE=$(date +%Y-%m-%d)
+
+          # Create changelog if it doesn't exist
+          if [ ! -f CHANGELOG.md ]; then
+            echo "# Changelog" > CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            echo "All notable changes to this project will be documented in this file." >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+          fi
+
+          # Prepare release notes
+          RELEASE_NOTES="${{ github.event.inputs.release_notes }}"
+          if [ -z "$RELEASE_NOTES" ]; then
+            RELEASE_NOTES="- Bug fixes and improvements"
+          fi
+
+          # Add new version to changelog
+          sed -i "3i\\## [${NEW_VERSION}] - ${DATE}\\n\\n${RELEASE_NOTES}\\n" CHANGELOG.md
+
+      - name: Commit changes
+        run: |
+          NEW_VERSION=${{ steps.version_bump.outputs.NEW_VERSION }}
+          git add package.json yb-selected-posts.php readme.txt CHANGELOG.md
+          git commit -m "Bump version to $NEW_VERSION"
+          git push
+
+      - name: Create and push tag
+        run: |
+          NEW_VERSION=${{ steps.version_bump.outputs.NEW_VERSION }}
+          git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
+          git push origin "v$NEW_VERSION"
+
+      - name: Create summary
+        run: |
+          NEW_VERSION=${{ steps.version_bump.outputs.NEW_VERSION }}
+          OLD_VERSION=${{ steps.version_bump.outputs.OLD_VERSION }}
+          echo "## Release Prepared! 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version bumped:** $OLD_VERSION → $NEW_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next steps:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. The release workflow will automatically trigger" >> $GITHUB_STEP_SUMMARY
+          echo "2. A GitHub release will be created with the plugin zip" >> $GITHUB_STEP_SUMMARY
+          echo "3. Check the [releases page](https://github.com/${{ github.repository }}/releases) in a few minutes" >> $GITHUB_STEP_SUMMARY
