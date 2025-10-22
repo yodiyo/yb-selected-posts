@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history so we can compare tags
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,28 +36,39 @@ jobs:
       - name: Install Composer dependencies (production)
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
-      - name: Create plugin zip
-        run: npm run plugin-zip
-
       - name: Get plugin version from tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
+      - name: Get previous tag
+        id: get_previous_tag
+        run: |
+          # Get the previous tag (second most recent)
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '2p')
+          if [ -z "$PREVIOUS_TAG" ]; then
+            # If no previous tag, use the first commit
+            PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+          echo "PREVIOUS_TAG=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+
+      - name: Create plugin zip
+        run: npm run plugin-zip
+
+      - name: Rename zip file with version
+        run: |
+          mv yb-selected-posts.zip yb-selected-posts-v${{ steps.get_version.outputs.VERSION }}.zip
+
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ steps.get_version.outputs.VERSION }}
+          name: Release ${{ steps.get_version.outputs.VERSION }}
           body: |
             ## What's Changed in v${{ steps.get_version.outputs.VERSION }}
 
             📦 **Ready-to-install WordPress plugin**
 
             ### Installation
-            1. Download the `yb-selected-posts.zip` file below
+            1. Download the `yb-selected-posts-v${{ steps.get_version.outputs.VERSION }}.zip` file below
             2. Go to your WordPress admin → Plugins → Add New → Upload Plugin
             3. Upload the zip file and activate
 
@@ -64,16 +77,8 @@ jobs:
             - All dependencies included
             - Ready to use immediately after activation
 
-            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.get_version.outputs.VERSION }}...HEAD
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.get_previous_tag.outputs.PREVIOUS_TAG }}...v${{ steps.get_version.outputs.VERSION }}
+          files: |
+            yb-selected-posts-v${{ steps.get_version.outputs.VERSION }}.zip
           draft: false
           prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./yb-selected-posts.zip
-          asset_name: yb-selected-posts-v${{ steps.get_version.outputs.VERSION }}.zip
-          asset_content_type: application/zip
