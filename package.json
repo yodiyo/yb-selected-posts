@@ -14,7 +14,7 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
 		"dist": "command -v composer >/dev/null 2>&1 || { echo >&2 'Error: Composer is not installed. Please install Composer to continue.'; exit 1; } && npm run build && composer install --no-dev --optimize-autoloader && npm run plugin-zip",
-		"dist:clean": "rm -rf node_modules && npm run dist"
+		"dist:clean": "rimraf node_modules && npm run dist"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.38.0",
