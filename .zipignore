@@ -1,0 +1,23 @@
+# Development files
+node_modules/
+src/
+.git/
+.gitignore
+.editorconfig
+.vscode/
+.DS_Store
+
+# GitHub files
+.github/
+README.md
+CHANGELOG.md
+
+# Build tools
+webpack.config.js
+package-lock.json
+composer.lock
+
+# Development dependencies
+phpunit.xml
+phpcs.xml
+tests/
