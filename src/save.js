@@ -18,10 +18,10 @@ import { useBlockProps } from '@wordpress/block-editor';
  *
  * @return {Element|null} Element to render.
  */
-export default function save({ attributes }) {
+export default function save( { attributes } ) {
 	const { selectedPost } = attributes;
 
-	if (!selectedPost) {
+	if ( ! selectedPost ) {
 		return null;
 	}
 
@@ -30,9 +30,9 @@ export default function save({ attributes }) {
 
 	// Return the post link markup
 	return (
-		<p className="dmg-read-more" {...useBlockProps.save()}>
-			<span>{__('Read more: ')}</span>
-			<a href={link}>{title.rendered}</a>
+		<p className="dmg-read-more" { ...useBlockProps.save() }>
+			<span>{ __( 'Read more: ' ) }</span>
+			<a href={ link }>{ title.rendered }</a>
 		</p>
 	);
 }

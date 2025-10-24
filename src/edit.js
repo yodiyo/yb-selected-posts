@@ -8,32 +8,32 @@ import {
 import { PanelBody, ComboboxControl } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 
-export default function Edit({ attributes, setAttributes }) {
-	const [selectedPost, setSelectedPost] = useState(null);
-	const [searchText, setSearchText] = useState('');
+export default function Edit( { attributes, setAttributes } ) {
+	const [ selectedPost, setSelectedPost ] = useState( null );
+	const [ searchText, setSearchText ] = useState( '' );
 
 	// Fetch posts data using useEntityRecords hook
 	const {
 		records: searchResults = [],
 		hasResolved,
 		isResolving,
-	} = useEntityRecords('postType', 'post', {
+	} = useEntityRecords( 'postType', 'post', {
 		search: searchText,
 		per_page: -1,
 		status: 'publish',
-	});
+	} );
 
-	useEffect(() => {
-		if (!hasResolved || isResolving) {
+	useEffect( () => {
+		if ( ! hasResolved || isResolving ) {
 			return;
 		}
 
 		// Set the default selected post as the first item from searchResults
-		if (selectedPost === null && attributes.selectedPost) {
+		if ( selectedPost === null && attributes.selectedPost ) {
 			const savedSelectedPost = searchResults.find(
-				(post) => post.id === attributes.selectedPost.id
+				( post ) => post.id === attributes.selectedPost.id
 			);
-			setSelectedPost(savedSelectedPost);
+			setSelectedPost( savedSelectedPost );
 		}
 	}, [
 		selectedPost,
@@ -41,16 +41,16 @@ export default function Edit({ attributes, setAttributes }) {
 		hasResolved,
 		isResolving,
 		searchResults,
-	]);
+	] );
 
-	const handleComboboxChange = (newValue) => {
-		if (isNaN(newValue) || newValue === null || !searchResults) {
+	const handleComboboxChange = ( newValue ) => {
+		if ( isNaN( newValue ) || newValue === null || ! searchResults ) {
 			return;
 		}
 
 		// Find the selected post object from searchResults based on the selected post ID
 		const selectedPostObject = searchResults.find(
-			(post) => post.id === newValue
+			( post ) => post.id === newValue
 		);
 
 		const {
@@ -58,51 +58,51 @@ export default function Edit({ attributes, setAttributes }) {
 			title: { rendered },
 			link,
 		} = selectedPostObject;
-		setSelectedPost({ id, title: { rendered }, link });
-		setAttributes({ selectedPost: { id, title: { rendered }, link } });
+		setSelectedPost( { id, title: { rendered }, link } );
+		setAttributes( { selectedPost: { id, title: { rendered }, link } } );
 	};
 
 	return (
-		<div {...useBlockProps()}>
+		<div { ...useBlockProps() }>
 			<InspectorControls>
-				<PanelBody title={__('Block Settings')}>
+				<PanelBody title={ __( 'Block Settings' ) }>
 					<ComboboxControl
-						label={__('Search Posts')}
+						label={ __( 'Search Posts' ) }
 						options={
 							searchResults
-								? searchResults.map((post) => ({
-									value: post.id,
-									label: post.title.rendered,
-								}))
+								? searchResults.map( ( post ) => ( {
+										value: post.id,
+										label: post.title.rendered,
+								  } ) )
 								: []
 						}
-						onChange={handleComboboxChange}
-						onInputChange={setSearchText}
-						selected={selectedPost ? selectedPost.id : ''}
+						onChange={ handleComboboxChange }
+						onInputChange={ setSearchText }
+						selected={ selectedPost ? selectedPost.id : '' }
 						help="Select or search for post."
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div {...useBlockProps()}>
-				{selectedPost ? (
+			<div { ...useBlockProps() }>
+				{ selectedPost ? (
 					selectedPost.title && (
 						<RichText.Content
 							tagName="p"
 							className="dmg-read-more"
 							value={
-								__('Read More: ') +
+								__( 'Read More: ' ) +
 								selectedPost.title.rendered
 							}
-							href={selectedPost.link}
+							href={ selectedPost.link }
 						/>
 					)
 				) : (
 					<p>
-						{__(
+						{ __(
 							'Select or search for a published post in side panel.'
-						)}
+						) }
 					</p>
-				)}
+				) }
 			</div>
 		</div>
 	);
